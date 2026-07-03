@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>All Accounts — Mockup</title>
+<style>
+  :root {
+    --bg-page:#F5F6F8; --bg-surface:#FFFFFF; --bg-tint:#F0F2F5;
+    --bg-selected:#E8F0FE; --bg-editing:#F5F8FF; --bg-hover:#F8F9FC;
+    --bg-primary:#1A73E8; --bg-danger:#D92D20; --bg-danger-subtle:#FEF3F2;
+    --bg-disabled:#F2F4F7;
+    --text-primary:#101828; --text-secondary:#667085; --text-tertiary:#98A2B3;
+    --text-positive:#067647; --text-negative:#D92D20;
+    --text-onprimary:#fff; --text-ondanger:#fff; --text-disabled:#98A2B3;
+    --border:#D0D5DD; --border-subtle:#EAECF0; --border-strong:#C4CADA;
+    --border-active:#1A73E8;
+    --icon-positive:#067647; --icon-secondary:#667085; --icon-tertiary:#98A2B3;
+    --radius-sm:4px; --radius-md:8px; --radius-lg:12px; --radius-full:9999px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.06);
+    --shadow-md:0 4px 12px rgba(16,24,40,.12);
+    --shadow-lg:0 12px 32px rgba(16,24,40,.20);
+    --ff:-apple-system,"Segoe UI",Roboto,sans-serif;
+    --dur:120ms;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--ff);font-size:14px;color:var(--text-primary);
+       background:var(--bg-page);line-height:1.5;-webkit-font-smoothing:antialiased}
+  button,input,select,textarea{font-family:inherit}
+  button{cursor:pointer}
+
+  /* ── layout ── */
+  .note{padding:6px 24px;font-size:12px;color:var(--text-secondary);
+        background:var(--bg-surface);border-bottom:1px solid var(--border-subtle)}
+  .screen{max-width:1380px;margin:0 auto;padding:20px 24px 64px}
+  h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-bottom:14px}
+
+  /* ── balance bar ── */
+  .bal-bar{display:flex;align-items:flex-start;gap:18px;padding:10px 0 14px;
+           border-bottom:1px solid var(--border-subtle);margin-bottom:10px}
+  .bal-item{display:flex;flex-direction:column;gap:2px}
+  .bal-row{display:flex;align-items:center;gap:5px}
+  .bal-amt{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+  .bal-lbl{font-size:11px;color:var(--text-secondary)}
+  .bal-op{font-size:17px;color:var(--text-tertiary);padding-top:2px}
+  .pos{color:var(--text-positive)} .neg{color:var(--text-negative)}
+  .muted{color:var(--text-secondary)}
+
+  /* ── toolbar ── */
+  .toolbar{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+  .tsep{width:1px;height:20px;background:var(--border);margin:0 2px}
+  .spacer{flex:1}
+
+  .btn{display:inline-flex;align-items:center;gap:4px;border-radius:var(--radius-md);
+       padding:6px 12px;font-size:13px;font-weight:500;border:1px solid var(--border);
+       background:var(--bg-surface);color:var(--text-primary);
+       transition:background var(--dur);white-space:nowrap;line-height:1.4}
+  .btn:hover:not(:disabled){background:var(--bg-tint)}
+  .btn.primary{background:var(--bg-primary);color:var(--text-onprimary);border-color:var(--bg-primary)}
+  .btn.primary:hover:not(:disabled){background:#1558c7}
+  .btn.danger{background:var(--bg-danger);color:var(--text-ondanger);border-color:var(--bg-danger)}
+  .btn.danger:hover:not(:disabled){background:#b91c1c}
+  .btn.ghost{background:none;border-color:transparent;color:var(--text-secondary)}
+  .btn.ghost:hover:not(:disabled){background:var(--bg-tint);color:var(--text-primary)}
+  .btn:disabled{opacity:.42;cursor:not-allowed}
+  .btn.sm{padding:4px 10px;font-size:12px}
+
+  /* ── search ── */
+  .srch{position:relative;display:flex;align-items:center}
+  .srch-icon{position:absolute;left:9px;color:var(--text-tertiary);font-size:13px;pointer-events:none}
+  .srch input{padding:6px 26px 6px 28px;border:1px solid var(--border);border-radius:var(--radius-md);
+              font-size:13px;width:220px;background:var(--bg-surface);transition:border-color var(--dur)}
+  .srch input:focus{outline:none;border-color:var(--border-active)}
+  .srch-x{position:absolute;right:7px;background:none;border:none;
+           color:var(--text-tertiary);font-size:15px;line-height:1;display:none}
+  .srch-x.on{display:block}
+
+  /* ── view dropdown ── */
+  .ddwrap{position:relative}
+  .ddmenu{position:absolute;top:calc(100% + 4px);left:0;background:var(--bg-surface);
+          border:1px solid var(--border);border-radius:var(--radius-md);
+          box-shadow:var(--shadow-md);min-width:150px;z-index:200;overflow:hidden;display:none}
+  .ddmenu.open{display:block}
+  .dditem{display:block;width:100%;text-align:left;padding:8px 14px;background:none;
+          border:none;font-size:13px;color:var(--text-primary);cursor:pointer}
+  .dditem:hover{background:var(--bg-tint)}
+  .dditem.active{font-weight:600;color:var(--bg-primary)}
+
+  /* ── bulk bar ── */
+  .bulk{display:none;align-items:center;gap:8px;padding:8px 12px;
+        background:var(--bg-selected);border:1px solid #C7D7FA;
+        border-radius:var(--radius-md);margin-bottom:8px;font-size:13px}
+  .bulk.on{display:flex}
+  .bulk-lbl{font-weight:600;margin-right:4px}
+
+  /* ── table ── */
+  .tbl-wrap{overflow-x:auto;border-radius:var(--radius-lg);
+            border:1px solid var(--border-subtle);box-shadow:var(--shadow-sm)}
+  table.txn{width:100%;min-width:940px;border-collapse:collapse;
+            background:var(--bg-surface);table-layout:fixed}
+
+  .txn thead{position:sticky;top:0;z-index:10}
+  .txn thead th{background:var(--bg-tint);border-bottom:1px solid var(--border-strong);
+                padding:8px 10px;font-size:11px;font-weight:600;letter-spacing:.06em;
+                text-transform:uppercase;color:var(--text-secondary);
+                user-select:none;white-space:nowrap}
+  .txn thead th.sort{cursor:pointer}
+  .txn thead th.sort:hover{color:var(--text-primary)}
+  .txn thead th.sa{color:var(--text-primary)}
+  .txn th.r,.txn td.r{text-align:right}
+  .txn th.c,.txn td.c{text-align:center}
+
+  /* column widths */
+  .w-ck{width:36px} .w-fl{width:28px} .w-at{width:28px} .w-ac{width:92px}
+  .w-dt{width:98px} .w-py{width:148px} .w-ct{width:188px}
+  .w-ot{width:112px} .w-in{width:112px} .w-cl{width:38px}
+
+  .txn tbody tr{border-bottom:1px solid var(--border-subtle);transition:background var(--dur)}
+  .txn tbody tr:last-child{border-bottom:none}
+  .txn tbody tr:hover td{background:var(--bg-hover)}
+  .txn tbody tr.sel td{background:var(--bg-selected)}
+  .txn tbody tr.editing td{background:var(--bg-editing)}
+  .txn tbody tr.sel:hover td{background:#dce8fd}
+  .txn tbody tr.act-row td{padding:5px 10px 8px;background:var(--bg-editing);cursor:default}
+  .txn tbody tr.act-row:hover td{background:var(--bg-editing)}
+
+  .txn td{padding:9px 10px;font-size:13px;vertical-align:middle;cursor:pointer}
+  .txn td.nd{cursor:default}
+  .txn td.trunc{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .txn td.sm{font-size:12px;color:var(--text-secondary)}
+  .out-amt{color:var(--text-primary)}
+  .in-amt{color:var(--text-positive);font-weight:500}
+
+  /* ── cleared icons ── */
+  .clr-btn{background:none;border:none;font-size:16px;line-height:1;
+           padding:2px 4px;border-radius:var(--radius-sm);transition:background var(--dur)}
+  .clr-btn:hover{background:var(--bg-tint)}
+  .c-unc{color:var(--icon-tertiary)}
+  .c-clr{color:var(--icon-positive)}
+  .c-rec{color:var(--icon-secondary);cursor:default}
+
+  /* ── flag ── */
+  .fp-wrap{display:flex;gap:3px;align-items:center}
+  .fp{width:13px;height:13px;border-radius:50%;cursor:pointer;
+      border:2px solid transparent;flex-shrink:0;transition:transform var(--dur)}
+  .fp:hover{transform:scale(1.3)}
+  .fp.active{border-color:var(--text-primary)}
+  .fp[data-c="red"]   {background:#F04438} .fp[data-c="orange"]{background:#F79009}
+  .fp[data-c="yellow"]{background:#EAC700} .fp[data-c="green"] {background:#17B26A}
+  .fp[data-c="blue"]  {background:#2E90FA} .fp[data-c="purple"]{background:#7A5AF8}
+  .fp[data-c="none"]  {background:#D0D5DD}
+  .flag-icon{font-size:10px;width:16px;display:inline-block;text-align:center}
+
+  /* ── edit inputs ── */
+  .ei{width:100%;padding:4px 6px;border:1px solid var(--border-active);
+      border-radius:var(--radius-sm);font:inherit;font-size:13px;background:#fff}
+  .ei:focus{outline:none;box-shadow:0 0 0 2px rgba(26,115,232,.18)}
+  .ei.r{text-align:right;font-variant-numeric:tabular-nums}
+  .ei.sm{font-size:12px}
+
+  /* ── empty ── */
+  .empty-state{text-align:center;padding:48px 16px;color:var(--text-secondary)}
+  .empty-state .big{font-size:36px;display:block;margin-bottom:10px}
+  .empty-state p{font-size:13px;margin-bottom:14px}
+
+  /* ── modal ── */
+  .mscrim{position:fixed;inset:0;background:rgba(16,24,40,.5);z-index:500;
+          display:grid;place-items:center;padding:16px}
+  .modal{background:var(--bg-surface);border-radius:var(--radius-lg);
+         box-shadow:var(--shadow-lg);width:400px;max-width:100%;padding:24px}
+  .modal h3{font-size:17px;margin-bottom:8px}
+  .modal p{color:var(--text-secondary);font-size:13px;margin-bottom:20px}
+  .modal-acts{display:flex;justify-content:flex-end;gap:8px}
+
+  /* ── toast ── */
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+         background:var(--text-primary);color:#fff;padding:7px 16px;
+         border-radius:var(--radius-full);font-size:13px;z-index:600;
+         pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap}
+  .toast.on{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="note">
+  Static mockup — All Accounts · faithful to <code>docs/screens/AllAccounts.md</code> v1.0
+  · tokens from <code>docs/Theme.md</code> v1.0. Sample data only.
+</div>
+
+<div class="screen" data-testid="all-accounts-screen">
+  <h1>All Accounts</h1>
+  <div id="balBar"  data-testid="balance-summary-bar"></div>
+  <div id="toolbar" data-testid="toolbar"></div>
+  <div id="bulkBar" data-testid="bulk-action-bar"></div>
+  <div class="tbl-wrap">
+    <table class="txn" data-testid="transaction-table">
+      <thead id="tHead"></thead>
+      <tbody id="tBody"></tbody>
+    </table>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   ACCOUNTS & CATEGORIES
+   ===================================================================== */
+const ACCOUNTS = {vcb:'VCB', momo:'MoMo', cash:'Cash', visa:'TechVisa'};
+
+const CATS = [
+  {g:'Bills',    n:'Phone & Internet', i:'📱'},
+  {g:'Bills',    n:'Electricity',      i:'⚡'},
+  {g:'Bills',    n:'Water',            i:'💧'},
+  {g:'Needs',    n:'Groceries',        i:'🛒'},
+  {g:'Needs',    n:'Rent',             i:'🏠'},
+  {g:'Wants',    n:'Dining out',       i:'🍽️'},
+  {g:'Wants',    n:'Coffee',           i:'☕'},
+  {g:'Wants',    n:'Entertainment',    i:'🎬'},
+  {g:'Transport',n:'Fuel',             i:'⛽'},
+  {g:'Transport',n:'Grab',             i:'🚗'},
+  {g:'Savings',  n:'Emergency Fund',   i:'🏦'},
+  {g:'Inflow',   n:'Ready to Assign',  i:''},
+];
+
+const FLAG_HEX = {
+  red:'#F04438', orange:'#F79009', yellow:'#EAC700',
+  green:'#17B26A', blue:'#2E90FA', purple:'#7A5AF8'
+};
+
+/* =====================================================================
+   SAMPLE DATA
+   ===================================================================== */
+let _seq = 20;
+const mkId = () => 't' + (++_seq);
+
+let txns = [
+  {id:'t1', acct:'vcb',  date:'2026-06-27', payee:'',              cg:'Bills',    cn:'Phone & Internet', ci:'📱', memo:'internet bill',  amt:-200_000,   clr:'cleared',    flag:null},
+  {id:'t2', acct:'vcb',  date:'2026-06-27', payee:'Bách Hóa Xanh', cg:'Needs',    cn:'Groceries',        ci:'🛒', memo:'thực phẩm',      amt:-420_000,   clr:'cleared',    flag:null},
+  {id:'t3', acct:'momo', date:'2026-06-27', payee:'KFC',            cg:'Wants',    cn:'Dining out',       ci:'🍽️',memo:'KFC Quận 1',      amt:-150_000,   clr:'cleared',    flag:'red'},
+  {id:'t4', acct:'cash', date:'2026-06-26', payee:'Petrolimex',     cg:'Transport',cn:'Fuel',             ci:'⛽', memo:'đổ đầy bình',   amt:-620_000,   clr:'cleared',    flag:null},
+  {id:'t5', acct:'vcb',  date:'2026-06-26', payee:'EVN HCMC',       cg:'Bills',    cn:'Electricity',      ci:'⚡', memo:'tháng 6',        amt:-680_000,   clr:'cleared',    flag:null},
+  {id:'t6', acct:'visa', date:'2026-06-25', payee:"Pizza 4P's",     cg:'Wants',    cn:'Dining out',       ci:'🍽️',memo:'tối thứ 7',       amt:-300_000,   clr:'uncleared',  flag:null},
+  {id:'t7', acct:'momo', date:'2026-06-25', payee:'Grab',            cg:'Transport',cn:'Grab',             ci:'🚗', memo:'sân bay T1',     amt:-85_000,    clr:'uncleared',  flag:'blue'},
+  {id:'t8', acct:'vcb',  date:'2026-06-20', payee:'Công ty ABC',    cg:'Inflow',   cn:'Ready to Assign',  ci:'',   memo:'lương tháng 6',  amt:18_000_000, clr:'cleared',    flag:null},
+  {id:'t9', acct:'vcb',  date:'2026-06-01', payee:'Starting Balance',cg:'Inflow',  cn:'Ready to Assign',  ci:'',   memo:'',               amt:25_000_000, clr:'cleared',    flag:null},
+  {id:'t10',acct:'momo', date:'2026-06-01', payee:'Starting Balance',cg:'Inflow',  cn:'Ready to Assign',  ci:'',   memo:'',               amt:2_000_000,  clr:'cleared',    flag:null},
+  {id:'t11',acct:'cash', date:'2026-06-01', payee:'Starting Balance',cg:'Inflow',  cn:'Ready to Assign',  ci:'',   memo:'',               amt:500_000,    clr:'reconciled', flag:null},
+];
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+let sortCol    = 'date';
+let sortDir    = 'desc';
+let view       = 'all';
+let search     = '';
+let rawSearch  = '';
+let selIds     = new Set();
+let editId     = null;
+let isAdding   = false;
+let flagOpenId = null;
+let ddOpen     = false;
+let undoStack  = [];
+let redoStack  = [];
+let srchTimer  = null;
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+function fmtVND(n) {
+  if (n === 0) return '0đ';
+  const s = n < 0 ? '-' : '';
+  return s + Math.abs(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + 'đ';
+}
+function fmtDateDisp(iso) {
+  const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`;
+}
+function todayIso() { return new Date().toISOString().slice(0,10); }
+function acctName(id) { return ACCOUNTS[id] || id; }
+function catLabel(g,n,i) { return g ? (i ? `${g}: ${i} ${n}` : `${g}: ${n}`) : ''; }
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+
+/* =====================================================================
+   UNDO / REDO
+   ===================================================================== */
+function snapshot() {
+  undoStack.push(JSON.parse(JSON.stringify(txns)));
+  if (undoStack.length > 30) undoStack.shift();
+  redoStack = [];
+}
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(JSON.parse(JSON.stringify(txns)));
+  txns = undoStack.pop();
+  editId = null; isAdding = false; selIds.clear(); flagOpenId = null;
+  render(); toast('Undone');
+}
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(JSON.parse(JSON.stringify(txns)));
+  txns = redoStack.pop();
+  editId = null; isAdding = false; selIds.clear(); flagOpenId = null;
+  render(); toast('Redone');
+}
+
+/* =====================================================================
+   COMPUTED
+   ===================================================================== */
+function getFiltered() {
+  let rows = txns.slice();
+  if (view !== 'all') rows = rows.filter(t => t.clr === view);
+  if (search.trim()) {
+    const q = search.toLowerCase();
+    rows = rows.filter(t =>
+      (t.payee||'').toLowerCase().includes(q) ||
+      (t.memo||'').toLowerCase().includes(q)  ||
+      catLabel(t.cg, t.cn, '').toLowerCase().includes(q)
+    );
+  }
+  return rows;
+}
+
+function getSorted(rows) {
+  const d = sortDir === 'asc' ? 1 : -1;
+  return rows.slice().sort((a,b) => {
+    let va, vb;
+    if (sortCol==='date')    { va=a.date; vb=b.date; }
+    else if (sortCol==='payee')   { va=a.payee||''; vb=b.payee||''; }
+    else if (sortCol==='account') { va=acctName(a.acct); vb=acctName(b.acct); }
+    else if (sortCol==='outflow') { va=a.amt<0?Math.abs(a.amt):0; vb=b.amt<0?Math.abs(b.amt):0; }
+    else if (sortCol==='inflow')  { va=a.amt>0?a.amt:0; vb=b.amt>0?b.amt:0; }
+    else { va=''; vb=''; }
+    return va<vb ? -d : va>vb ? d : 0;
+  });
+}
+
+function getBalances() {
+  let cleared=0, uncleared=0;
+  txns.forEach(t => {
+    if (t.clr==='cleared'||t.clr==='reconciled') cleared+=t.amt;
+    else uncleared+=t.amt;
+  });
+  return {cleared, uncleared, working: cleared+uncleared};
+}
+
+/* =====================================================================
+   TOAST
+   ===================================================================== */
+let _toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('on');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('on'), 1900);
+}
+
+/* =====================================================================
+   RENDER: BALANCE BAR
+   ===================================================================== */
+function renderBalance() {
+  const {cleared, uncleared, working} = getBalances();
+  const cc = cleared>=0?'pos':'neg';
+  const uc = uncleared===0?'muted':uncleared<0?'neg':'pos';
+  const wc = working>=0?'pos':'neg';
+  document.getElementById('balBar').innerHTML = `
+    <div class="bal-item">
+      <div class="bal-row">
+        <span class="${cc}" style="font-size:15px">⊙</span>
+        <span class="bal-amt ${cc}" data-testid="cleared-balance">${fmtVND(cleared)}</span>
+      </div>
+      <span class="bal-lbl">Cleared Balance</span>
+    </div>
+    <span class="bal-op">+</span>
+    <div class="bal-item">
+      <div class="bal-row">
+        <span class="${uc}" style="font-size:15px">○</span>
+        <span class="bal-amt ${uc}" data-testid="uncleared-balance">${fmtVND(uncleared)}</span>
+      </div>
+      <span class="bal-lbl">Uncleared Balance</span>
+    </div>
+    <span class="bal-op">=</span>
+    <div class="bal-item">
+      <div class="bal-row">
+        <span class="bal-amt ${wc}" style="font-weight:700" data-testid="working-balance">${fmtVND(working)}</span>
+      </div>
+      <span class="bal-lbl">Working Balance</span>
+    </div>`;
+}
+
+/* =====================================================================
+   RENDER: TOOLBAR
+   ===================================================================== */
+function renderToolbar() {
+  const vl = {all:'All',uncleared:'Uncleared',cleared:'Cleared',reconciled:'Reconciled'};
+  document.getElementById('toolbar').innerHTML = `
+    <button class="btn primary" data-testid="add-transaction-btn" onclick="startAdd()">+ Add Transaction</button>
+    <button class="btn" data-testid="file-import-btn" onclick="toast('File import — not implemented in mockup')">⬆ File Import</button>
+    <div class="tsep"></div>
+    <button class="btn ghost" data-testid="undo-btn" ${undoStack.length?'':'disabled'} onclick="undo()">↩ Undo</button>
+    <button class="btn ghost" data-testid="redo-btn" ${redoStack.length?'':'disabled'} onclick="redo()">↪ Redo</button>
+    <div class="spacer"></div>
+    <div class="ddwrap">
+      <button class="btn" data-testid="view-dropdown" onclick="toggleDd(event)">${vl[view]} ▾</button>
+      <div class="ddmenu ${ddOpen?'open':''}" id="ddMenu">
+        ${['all','uncleared','cleared','reconciled'].map(v=>`
+          <button class="dditem ${view===v?'active':''}" data-testid="view-option-${v}"
+            onclick="setView('${v}')">${vl[v]}</button>`).join('')}
+      </div>
+    </div>
+    <div class="srch">
+      <span class="srch-icon">🔍</span>
+      <input id="srchInput" data-testid="search-input" type="text"
+        placeholder="Search All Accounts" value="${esc(rawSearch)}"
+        oninput="onSearch(this.value)" />
+      <button class="srch-x ${rawSearch?'on':''}" data-testid="search-clear-btn"
+        onclick="clearSearch()">×</button>
+    </div>`;
+}
+
+/* =====================================================================
+   RENDER: BULK BAR
+   ===================================================================== */
+function renderBulk() {
+  const bar = document.getElementById('bulkBar');
+  const n = selIds.size;
+  if (!n) { bar.className='bulk'; bar.innerHTML=''; return; }
+  bar.className = 'bulk on';
+  bar.innerHTML = `
+    <span class="bulk-lbl" data-testid="bulk-count-label">${n} transaction${n>1?'s':''} selected</span>
+    <button class="btn sm" data-testid="bulk-clear-btn" onclick="bulkSetCleared('cleared')">Mark as Cleared</button>
+    <button class="btn sm" data-testid="bulk-unclear-btn" onclick="bulkSetCleared('uncleared')">Mark as Uncleared</button>
+    <button class="btn sm danger" data-testid="bulk-delete-btn" onclick="openDeleteModal([...selIds])">Delete</button>
+    <button class="btn sm ghost" data-testid="bulk-cancel-btn" onclick="clearSel()">Cancel</button>`;
+}
+
+/* =====================================================================
+   RENDER: TABLE HEAD
+   ===================================================================== */
+function renderHead() {
+  const filtered = getFiltered();
+  const allSel = filtered.length>0 && filtered.every(t=>selIds.has(t.id));
+  const sh = (col,lbl,cls='') => {
+    const active = sortCol===col;
+    const arr = active ? (sortDir==='asc'?' ▲':' ▼') : '';
+    return `<th class="${cls} sort ${active?'sa':''}" onclick="setSort('${col}')">${lbl}${arr}</th>`;
+  };
+  document.getElementById('tHead').innerHTML = `<tr>
+    <th class="w-ck c"><input type="checkbox" data-testid="select-all-checkbox"
+      ${allSel?'checked':''} onchange="toggleAll(this.checked)"/></th>
+    <th class="w-fl c" title="Flag">🚩</th>
+    <th class="w-at c" title="Attachment">📎</th>
+    ${sh('account','Account','w-ac')}
+    ${sh('date','Date','w-dt')}
+    ${sh('payee','Payee','w-py')}
+    <th class="w-ct">Category</th>
+    <th>Memo</th>
+    ${sh('outflow','Outflow','w-ot r')}
+    ${sh('inflow','Inflow','w-in r')}
+    <th class="w-cl c" title="Cleared status">⊙</th>
+  </tr>`;
+}
+
+/* =====================================================================
+   RENDER: TABLE BODY
+   ===================================================================== */
+function renderBody() {
+  const filtered = getFiltered();
+  const rows = getSorted(filtered);
+  let html = '';
+
+  if (isAdding) html += buildAddRow();
+
+  if (!rows.length && !isAdding) {
+    const msg  = search ? 'No transactions match your search'
+               : view!=='all' ? `No ${view} transactions`
+               : 'No transactions yet';
+    const tid  = search ? 'search-empty' : view!=='all' ? 'view-empty' : 'transaction-table-empty';
+    const act  = search
+      ? `<button class="btn sm ghost" onclick="clearSearch()">Clear search</button>`
+      : view!=='all'
+        ? `<button class="btn sm ghost" onclick="setView('all')">Show all</button>`
+        : `<button class="btn primary sm" onclick="startAdd()">+ Add Transaction</button>`;
+    html = `<tr><td colspan="11"><div class="empty-state" data-testid="${tid}">
+      <span class="big">📋</span><p>${msg}</p>${act}</div></td></tr>`;
+  }
+
+  rows.forEach(t => {
+    html += (t.id===editId) ? buildEditRow(t) : buildRow(t);
+  });
+
+  document.getElementById('tBody').innerHTML = html;
+}
+
+/* ── Normal row ──────────────────────────────────────────────────── */
+function buildRow(t) {
+  const sel = selIds.has(t.id);
+  const flagStyle = t.flag ? `color:${FLAG_HEX[t.flag]}` : 'color:var(--icon-tertiary)';
+  const flagTxt   = t.flag ? '●' : '○';
+  const clrCls  = {cleared:'c-clr',uncleared:'c-unc',reconciled:'c-rec'}[t.clr];
+  const clrIcon = {cleared:'⊙',   uncleared:'○',    reconciled:'🔒'}[t.clr];
+  const clrTip  = t.clr==='reconciled' ? 'title="Reconciled transactions cannot be modified"' : '';
+  const outCell = t.amt<0 ? `<span class="out-amt">${fmtVND(Math.abs(t.amt))}</span>` : '';
+  const inCell  = t.amt>0 ? `<span class="in-amt">${fmtVND(t.amt)}</span>` : '';
+  const catTxt  = esc(catLabel(t.cg,t.cn,t.ci));
+  return `
+<tr class="${sel?'sel':''}" data-testid="transaction-row-${t.id}"
+    onclick="onRowClick(event,'${t.id}')">
+  <td class="c nd w-ck">
+    <input type="checkbox" data-testid="row-checkbox-${t.id}" ${sel?'checked':''}
+      onchange="event.stopPropagation();toggleSel('${t.id}',this.checked)"/>
+  </td>
+  <td class="c nd w-fl" data-testid="row-flag-${t.id}"
+      onclick="event.stopPropagation();openFlag('${t.id}')">
+    <span class="flag-icon" style="${flagStyle}">${flagTxt}</span>
+  </td>
+  <td class="c nd w-at" data-testid="row-attachment-${t.id}"
+      onclick="event.stopPropagation();toast('Attachment — not implemented in mockup')">
+    <span style="color:var(--icon-tertiary);font-size:13px">📎</span>
+  </td>
+  <td class="w-ac">${esc(acctName(t.acct))}</td>
+  <td class="w-dt">${fmtDateDisp(t.date)}</td>
+  <td class="w-py trunc" title="${esc(t.payee)}">${esc(t.payee)}</td>
+  <td class="w-ct trunc sm" title="${catTxt}">${catTxt}</td>
+  <td class="trunc sm" title="${esc(t.memo)}">${esc(t.memo)}</td>
+  <td class="w-ot r">${outCell}</td>
+  <td class="w-in r">${inCell}</td>
+  <td class="w-cl c nd" data-testid="row-cleared-${t.id}">
+    <button class="clr-btn ${clrCls}" ${clrTip}
+      onclick="event.stopPropagation();toggleCleared('${t.id}')">${clrIcon}</button>
+  </td>
+</tr>`;
+}
+
+/* ── Edit row ────────────────────────────────────────────────────── */
+function buildEditRow(t) {
+  const catOpts = CATS.map(c => {
+    const val = `${c.g}|${c.n}|${c.i}`;
+    const sel = t.cg===c.g && t.cn===c.n ? 'selected' : '';
+    return `<option value="${esc(val)}" ${sel}>${esc(catLabel(c.g,c.n,c.i))}</option>`;
+  }).join('');
+  const acctOpts = Object.entries(ACCOUNTS).map(([id,nm]) =>
+    `<option value="${id}" ${t.acct===id?'selected':''}>${nm}</option>`).join('');
+  const outVal = t.amt<0 ? Math.abs(t.amt) : '';
+  const inVal  = t.amt>0 ? t.amt : '';
+  const isStart = t.payee==='Starting Balance';
+  return `
+<tr class="editing" data-testid="transaction-row-${t.id}">
+  <td class="c nd w-ck"><input type="checkbox" disabled/></td>
+  <td class="c nd w-fl"></td>
+  <td class="c nd w-at"></td>
+  <td class="w-ac"><select class="ei sm" id="ei-acct" data-testid="edit-account-${t.id}">${acctOpts}</select></td>
+  <td class="w-dt"><input class="ei" id="ei-date" type="date" value="${t.date}" data-testid="edit-date-${t.id}"/></td>
+  <td class="w-py"><input class="ei" id="ei-payee" type="text" value="${esc(t.payee)}" placeholder="Payee" data-testid="edit-payee-${t.id}"/></td>
+  <td class="w-ct"><select class="ei sm" id="ei-cat" data-testid="edit-category-${t.id}">${catOpts}</select></td>
+  <td><input class="ei" id="ei-memo" type="text" value="${esc(t.memo)}" placeholder="Memo" data-testid="edit-memo-${t.id}"/></td>
+  <td class="w-ot"><input class="ei r" id="ei-out" type="number" min="0" placeholder="0" value="${outVal}"
+    data-testid="edit-outflow-${t.id}" oninput="if(+this.value)document.getElementById('ei-in').value=''"/></td>
+  <td class="w-in"><input class="ei r" id="ei-in" type="number" min="0" placeholder="0" value="${inVal}"
+    data-testid="edit-inflow-${t.id}" oninput="if(+this.value)document.getElementById('ei-out').value=''"/></td>
+  <td class="c nd w-cl"></td>
+</tr>
+<tr class="act-row">
+  <td colspan="11">
+    <span style="display:flex;gap:8px;align-items:center">
+      <button class="btn sm primary" data-testid="edit-save-${t.id}" onclick="commitEdit('${t.id}')">Save</button>
+      <button class="btn sm ghost"   data-testid="edit-cancel-${t.id}" onclick="cancelEdit()">Cancel</button>
+      ${!isStart?`<button class="btn sm danger" data-testid="edit-delete-${t.id}" onclick="openDeleteModal(['${t.id}'])">Delete</button>`:''}
+    </span>
+  </td>
+</tr>`;
+}
+
+/* ── Add row ─────────────────────────────────────────────────────── */
+function buildAddRow() {
+  const catOpts = CATS.map(c => {
+    const val = `${c.g}|${c.n}|${c.i}`;
+    return `<option value="${esc(val)}">${esc(catLabel(c.g,c.n,c.i))}</option>`;
+  }).join('');
+  const acctOpts = Object.entries(ACCOUNTS).map(([id,nm]) =>
+    `<option value="${id}">${nm}</option>`).join('');
+  return `
+<tr class="editing" id="addRow" data-testid="new-transaction-row">
+  <td class="c nd w-ck"></td><td class="c nd w-fl"></td><td class="c nd w-at"></td>
+  <td class="w-ac"><select class="ei sm" id="na-acct">${acctOpts}</select></td>
+  <td class="w-dt"><input class="ei" id="na-date" type="date" value="${todayIso()}"/></td>
+  <td class="w-py"><input class="ei" id="na-payee" type="text" placeholder="Payee"/></td>
+  <td class="w-ct"><select class="ei sm" id="na-cat">${catOpts}</select></td>
+  <td><input class="ei" id="na-memo" type="text" placeholder="Memo"/></td>
+  <td class="w-ot"><input class="ei r" id="na-out" type="number" min="0" placeholder="0"
+    oninput="if(+this.value)document.getElementById('na-in').value=''"/></td>
+  <td class="w-in"><input class="ei r" id="na-in" type="number" min="0" placeholder="0"
+    oninput="if(+this.value)document.getElementById('na-out').value=''"/></td>
+  <td class="c nd w-cl"></td>
+</tr>
+<tr class="act-row">
+  <td colspan="11">
+    <span style="display:flex;gap:8px;align-items:center">
+      <button class="btn sm primary" onclick="commitAdd()">Save</button>
+      <button class="btn sm ghost"   onclick="cancelAdd()">Cancel</button>
+    </span>
+  </td>
+</tr>`;
+}
+
+/* =====================================================================
+   MAIN RENDER
+   ===================================================================== */
+function render() {
+  renderBalance(); renderToolbar(); renderBulk(); renderHead(); renderBody();
+}
+function renderTable() {
+  renderBalance(); renderBulk(); renderHead(); renderBody();
+}
+
+/* =====================================================================
+   ACTIONS — Sort / View / Search / Selection
+   ===================================================================== */
+function setSort(col) {
+  if (sortCol===col) sortDir = sortDir==='asc'?'desc':'asc';
+  else { sortCol=col; sortDir=col==='date'?'desc':'asc'; }
+  render();
+}
+
+function setView(v) { view=v; ddOpen=false; render(); }
+function toggleDd(ev) { ev.stopPropagation(); ddOpen=!ddOpen; renderToolbar(); }
+document.addEventListener('click', () => { if(ddOpen){ddOpen=false; renderToolbar();} });
+
+function onSearch(v) {
+  rawSearch = v;
+  document.querySelector('.srch-x')?.classList.toggle('on', !!v);
+  clearTimeout(srchTimer);
+  srchTimer = setTimeout(() => { search=v; renderTable(); }, 200);
+}
+function clearSearch() {
+  search=''; rawSearch='';
+  const inp = document.getElementById('srchInput');
+  if(inp) inp.value='';
+  document.querySelector('.srch-x')?.classList.remove('on');
+  renderTable();
+}
+
+function toggleSel(id, checked) {
+  checked ? selIds.add(id) : selIds.delete(id);
+  renderBulk(); renderHead();
+  // update row class without full re-render
+  const row = document.querySelector(`[data-testid="transaction-row-${id}"]`);
+  if(row) row.classList.toggle('sel', checked);
+}
+function toggleAll(checked) {
+  getFiltered().forEach(t => checked ? selIds.add(t.id) : selIds.delete(t.id));
+  renderTable();
+}
+function clearSel() { selIds.clear(); renderTable(); }
+
+/* =====================================================================
+   ACTIONS — Add / Edit / Delete
+   ===================================================================== */
+function startAdd() {
+  cancelEdit();
+  isAdding = true;
+  render();
+  setTimeout(() => document.getElementById('na-date')?.focus(), 0);
+}
+function cancelAdd() { isAdding=false; render(); }
+function commitAdd() {
+  const acct  = document.getElementById('na-acct')?.value  || Object.keys(ACCOUNTS)[0];
+  const date  = document.getElementById('na-date')?.value  || todayIso();
+  const payee = document.getElementById('na-payee')?.value || '';
+  const catRaw= document.getElementById('na-cat')?.value   || '';
+  const memo  = document.getElementById('na-memo')?.value  || '';
+  const outv  = parseFloat(document.getElementById('na-out')?.value) || 0;
+  const inv   = parseFloat(document.getElementById('na-in')?.value)  || 0;
+  if (!outv && !inv) { toast('Enter an Outflow or Inflow amount'); return; }
+  const [cg,cn,ci] = catRaw.split('|');
+  snapshot();
+  txns.unshift({id:mkId(), acct, date, payee, cg:cg||'', cn:cn||'', ci:ci||'', memo,
+                amt: inv>0 ? inv : -outv, clr:'uncleared', flag:null});
+  isAdding=false; render(); toast('Transaction added');
+}
+
+function onRowClick(ev, id) {
+  if (['INPUT','BUTTON','SELECT','LABEL'].includes(ev.target.tagName)) return;
+  if (editId===id) return;
+  if (editId) commitEdit(editId);
+  editId=id; isAdding=false;
+  render();
+  setTimeout(() => document.getElementById('ei-date')?.focus(), 0);
+}
+function cancelEdit() { editId=null; render(); }
+function commitEdit(id) {
+  const t = txns.find(x=>x.id===id);
+  if (!t) { cancelEdit(); return; }
+  const acct  = document.getElementById('ei-acct')?.value;
+  const date  = document.getElementById('ei-date')?.value;
+  const payee = document.getElementById('ei-payee')?.value ?? t.payee;
+  const catRaw= document.getElementById('ei-cat')?.value ?? '';
+  const memo  = document.getElementById('ei-memo')?.value ?? t.memo;
+  const outv  = parseFloat(document.getElementById('ei-out')?.value) || 0;
+  const inv   = parseFloat(document.getElementById('ei-in')?.value)  || 0;
+  if (!outv && !inv) { toast('Enter an Outflow or Inflow amount'); return; }
+  const [cg,cn,ci] = (catRaw||'').split('|');
+  snapshot();
+  Object.assign(t, {
+    acct: acct||t.acct, date: date||t.date, payee, memo,
+    cg: cg||t.cg, cn: cn||t.cn, ci: ci!==undefined?ci:t.ci,
+    amt: inv>0 ? inv : -outv
+  });
+  editId=null; render();
+}
+
+/* =====================================================================
+   ACTIONS — Cleared / Flag / Bulk / Delete
+   ===================================================================== */
+function toggleCleared(id) {
+  const t = txns.find(x=>x.id===id);
+  if (!t) return;
+  if (t.clr==='reconciled') { toast('Reconciled transactions cannot be modified'); return; }
+  snapshot();
+  t.clr = t.clr==='cleared' ? 'uncleared' : 'cleared';
+  renderBalance(); renderBulk(); renderHead(); renderBody();
+}
+
+function openFlag(id) {
+  if (flagOpenId===id) { flagOpenId=null; renderBody(); return; }
+  flagOpenId=id;
+  // inject picker into the flag cell
+  const cell = document.querySelector(`[data-testid="row-flag-${id}"]`);
+  if (!cell) return;
+  const t = txns.find(x=>x.id===id);
+  const dots = ['none','red','orange','yellow','green','blue','purple'].map(c => {
+    const style = c==='none' ? 'background:#D0D5DD' : `background:${FLAG_HEX[c]}`;
+    const active = (c==='none' && !t.flag) || t.flag===c ? 'active' : '';
+    return `<span class="fp ${active}" data-c="${c}" style="${style}"
+      onclick="event.stopPropagation();setFlag('${id}','${c}')"></span>`;
+  }).join('');
+  cell.innerHTML = `<div class="fp-wrap">${dots}</div>`;
+}
+function setFlag(id, colorStr) {
+  const t = txns.find(x=>x.id===id);
+  if(!t) return;
+  snapshot();
+  t.flag = colorStr==='none' ? null : colorStr;
+  flagOpenId=null; renderBody();
+}
+
+function bulkSetCleared(val) {
+  const ids=[...selIds];
+  const skipped = ids.filter(id=>txns.find(t=>t.id===id)?.clr==='reconciled').length;
+  snapshot();
+  ids.forEach(id=>{ const t=txns.find(x=>x.id===id); if(t&&t.clr!=='reconciled') t.clr=val; });
+  selIds.clear(); renderTable();
+  if (skipped) toast(`${skipped} reconciled transaction${skipped>1?'s':''} were not modified`);
+}
+
+function openDeleteModal(ids) {
+  const n = ids.length;
+  const scrim = document.createElement('div');
+  scrim.className='mscrim';
+  scrim.innerHTML=`<div class="modal" role="dialog" aria-modal="true" data-testid="delete-modal">
+    <h3>Delete ${n} transaction${n>1?'s':''}?</h3>
+    <p>This action cannot be undone.</p>
+    <div class="modal-acts">
+      <button class="btn ghost" data-testid="delete-cancel-btn">Cancel</button>
+      <button class="btn danger" data-testid="delete-confirm-btn">Delete</button>
+    </div>
+  </div>`;
+  const close = () => scrim.remove();
+  scrim.querySelector('[data-testid="delete-cancel-btn"]').onclick = close;
+  scrim.querySelector('[data-testid="delete-confirm-btn"]').onclick = () => {
+    snapshot();
+    ids.forEach(id => { const i=txns.findIndex(t=>t.id===id); if(i>-1) txns.splice(i,1); });
+    selIds.clear(); editId=null; isAdding=false;
+    close(); render(); toast(`${n} transaction${n>1?'s':''} deleted`);
+  };
+  scrim.onclick = ev => { if(ev.target===scrim) close(); };
+  document.body.appendChild(scrim);
+}
+
+/* =====================================================================
+   KEYBOARD SHORTCUTS
+   ===================================================================== */
+document.addEventListener('keydown', ev => {
+  const mod = ev.ctrlKey || ev.metaKey;
+  if (ev.key==='Escape') {
+    if (isAdding) cancelAdd();
+    else if (editId) cancelEdit();
+    else if (flagOpenId) { flagOpenId=null; renderBody(); }
+  }
+  if (mod && ev.key==='z' && !ev.shiftKey) { ev.preventDefault(); undo(); }
+  if (mod && (ev.key==='y' || (ev.key==='z' && ev.shiftKey))) { ev.preventDefault(); redo(); }
+  if (mod && ev.key==='f') { ev.preventDefault(); document.getElementById('srchInput')?.focus(); }
+});
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Budget Overview — Mockup</title>
+<style>
+  /* ============================================================
+     Design tokens — sourced from docs/Theme.md v1.0
+     ============================================================ */
+  :root {
+    /* color.bg.* */
+    --color-bg-page: #F5F6F8;
+    --color-bg-surface: #FFFFFF;
+    --color-bg-subtleTint: #F0F2F5;
+    --color-bg-selectedRow: #E8F0FE;
+    --color-bg-primary: #1A73E8;
+    --color-bg-danger: #D92D20;
+    --color-bg-dangerSubtle: #FEF3F2;
+    --color-bg-info: #1570EF;
+    --color-bg-infoSubtle: #EFF6FF;
+    --color-bg-overlay: #FFFFFF;
+    --color-bg-scrim: rgba(16, 24, 40, 0.50);
+    --color-bg-skeleton: #E4E7EC;
+    --color-bg-skeletonShimmer: #F2F4F7;
+    /* color.text.* */
+    --color-text-primary: #101828;
+    --color-text-secondary: #667085;
+    --color-text-positive: #067647;
+    --color-text-negative: #D92D20;
+    --color-text-danger: #B42318;
+    --color-text-info: #175CD3;
+    --color-text-onPrimary: #FFFFFF;
+    --color-text-onDanger: #FFFFFF;
+    --color-text-onInfo: #FFFFFF;
+    /* color.border.* */
+    --color-border-default: #D0D5DD;
+    --color-border-subtle: #EAECF0;
+    --color-border-active: #1A73E8;
+    /* color.icon.* */
+    --color-icon-secondary: #667085;
+    --color-icon-danger: #D92D20;
+    --color-icon-info: #1570EF;
+    /* font */
+    --font-family-base: "Inter", -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-size-xs: 12px; --font-size-sm: 14px; --font-size-md: 16px;
+    --font-size-lg: 18px; --font-size-xl: 22px; --font-size-2xl: 28px;
+    --font-weight-regular: 400; --font-weight-medium: 500;
+    --font-weight-semibold: 600; --font-weight-bold: 700;
+    /* space */
+    --space-xs: 4px; --space-sm: 8px; --space-md: 16px;
+    --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px;
+    /* radius */
+    --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-full: 9999px;
+    /* shadow */
+    --shadow-sm: 0 1px 2px rgba(16,24,40,0.06);
+    --shadow-md: 0 4px 12px rgba(16,24,40,0.12);
+    --shadow-lg: 0 12px 32px rgba(16,24,40,0.20);
+    /* z */
+    --z-sticky: 100; --z-popover: 300; --z-scrim: 400; --z-modal: 500;
+    /* motion */
+    --motion-duration-fast: 120ms;
+    --motion-duration-base: 200ms;
+    --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-md);
+    color: var(--color-text-primary);
+    background: var(--color-bg-page);
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ---------- Layout ---------- */
+  .content {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: var(--space-lg) var(--space-xl);
+  }
+
+  /* ---------- Page header ---------- */
+  .page-header { margin-bottom: var(--space-lg); }
+  .month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+  .month-arrow {
+    width: 36px; height: 36px;
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-md);
+    color: var(--color-icon-secondary);
+    font-size: var(--font-size-lg);
+    display: grid; place-items: center;
+    transition: background var(--motion-duration-fast);
+  }
+  .month-arrow:hover { background: var(--color-bg-subtleTint); }
+  .month-label {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    min-width: 190px;
+    text-align: center;
+    background: none; border: none;
+    color: var(--color-text-primary);
+  }
+  .month-label:hover { text-decoration: underline; }
+
+  /* ---------- AlertBar ---------- */
+  .alert-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+  }
+  .alert-bar[hidden] { display: none; }
+  .alert-bar.info {
+    background: var(--color-bg-infoSubtle);
+    color: var(--color-text-info);
+  }
+  .alert-bar.danger {
+    background: var(--color-bg-dangerSubtle);
+    color: var(--color-text-danger);
+  }
+  .alert-bar .alert-icon { font-size: var(--font-size-lg); line-height: 1; }
+  .alert-bar .alert-msg { flex: 1; }
+  .alert-bar .alert-msg b { font-weight: var(--font-weight-semibold); }
+  .alert-bar .alert-action {
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-onPrimary);
+  }
+  .alert-bar.info .alert-action { background: var(--color-bg-info); }
+  .alert-bar.danger .alert-action { background: var(--color-bg-danger); }
+
+  /* ---------- Two-column grid ---------- */
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 65fr) minmax(0, 35fr);
+    gap: var(--space-lg);
+    align-items: start;
+  }
+  @media (max-width: 1023px) {
+    .grid { grid-template-columns: 1fr; }
+    .detail-col { position: static !important; }
+  }
+
+  /* ---------- Filter tabs ---------- */
+  .filter-tabs {
+    display: flex;
+    gap: var(--space-lg);
+    border-bottom: 1px solid var(--color-border-subtle);
+    margin-bottom: var(--space-md);
+    overflow-x: auto;
+  }
+  .filter-tab {
+    background: none; border: none;
+    padding: var(--space-sm) 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color var(--motion-duration-fast);
+  }
+  .filter-tab:hover { color: var(--color-text-primary); }
+  .filter-tab.active {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-medium);
+    border-bottom-color: var(--color-border-active);
+  }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+  .tool-btn {
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+    color: var(--color-text-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+  }
+  .tool-btn.primary {
+    background: var(--color-bg-primary);
+    color: var(--color-text-onPrimary);
+    border-color: var(--color-bg-primary);
+    font-weight: var(--font-weight-medium);
+  }
+  .tool-btn.icon-only { color: var(--color-icon-secondary); }
+  .toolbar .spacer { flex: 1; }
+
+  /* ---------- Envelope table ---------- */
+  .card {
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+  .env-table { width: 100%; }
+  .table-head {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 130px 130px 140px;
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+  .table-head .num { text-align: right; }
+
+  .group-row {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 130px 130px 140px;
+    align-items: center;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-bg-subtleTint);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-border-subtle);
+    user-select: none;
+  }
+  .group-row .chevron {
+    display: inline-block;
+    width: 1.2em;
+    color: var(--color-icon-secondary);
+  }
+  .group-row .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .env-row {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 130px 130px 140px;
+    align-items: center;
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--color-border-subtle);
+    cursor: pointer;
+    transition: background var(--motion-duration-fast);
+  }
+  .env-row:hover { background: var(--color-bg-page); }
+  .env-row.selected { background: var(--color-bg-selectedRow); }
+  .env-row .env-name {
+    padding-left: var(--space-lg);
+    display: flex; align-items: center; gap: var(--space-sm);
+    min-width: 0;
+  }
+  .env-row .env-name .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .badge {
+    font-size: var(--font-size-xs);
+    padding: 2px var(--space-sm);
+    border-radius: var(--radius-full);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+  }
+  .badge.spent { background: var(--color-bg-subtleTint); color: var(--color-text-secondary); }
+  .badge.over { background: var(--color-bg-dangerSubtle); color: var(--color-text-danger); }
+
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .cell-assigned, .cell-activity, .cell-available { text-align: right; font-variant-numeric: tabular-nums; }
+  .cell-assigned { color: var(--color-text-primary); border-radius: var(--radius-sm); padding: 2px 4px; }
+  .cell-assigned:hover { outline: 1px dashed var(--color-border-default); }
+  .cell-activity.clickable { color: var(--color-text-negative); cursor: pointer; }
+  .cell-activity.clickable:hover { text-decoration: underline; }
+  .cell-activity.zero { color: var(--color-text-secondary); cursor: default; }
+  .pos { color: var(--color-text-positive); }
+  .neg { color: var(--color-text-negative); }
+  .zero-amt { color: var(--color-text-secondary); }
+
+  .assigned-input {
+    width: 100%;
+    text-align: right;
+    border: 1px solid var(--color-border-active);
+    border-radius: var(--radius-sm);
+    padding: 2px var(--space-xs);
+    font: inherit;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Detail panel ---------- */
+  .detail-col { position: sticky; top: var(--space-lg); }
+  .detail-panel { padding: var(--space-lg); }
+  .detail-empty {
+    color: var(--color-text-secondary);
+    text-align: center;
+    padding: var(--space-2xl) var(--space-md);
+    font-size: var(--font-size-sm);
+  }
+  .detail-empty .big { font-size: 32px; display:block; margin-bottom: var(--space-sm); }
+
+  .detail-header {
+    display: flex; align-items: center; gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+  }
+  .detail-header .name {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    flex: 1;
+  }
+  .icon-btn {
+    background: none; border: none;
+    color: var(--color-icon-secondary);
+    font-size: var(--font-size-md);
+    padding: var(--space-xs);
+    border-radius: var(--radius-sm);
+  }
+  .icon-btn:hover { background: var(--color-bg-subtleTint); }
+
+  .edit-form { margin-bottom: var(--space-lg); }
+  .edit-form .name-input {
+    width: 100%;
+    padding: var(--space-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    font: inherit;
+    margin-bottom: var(--space-sm);
+  }
+  .edit-form .name-input:focus { outline: none; border-color: var(--color-border-active); }
+  .edit-actions { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
+  .btn {
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-surface);
+    color: var(--color-text-primary);
+  }
+  .btn.primary { background: var(--color-bg-primary); color: var(--color-text-onPrimary); border-color: var(--color-bg-primary); }
+  .btn.danger { background: var(--color-bg-danger); color: var(--color-text-onDanger); border-color: var(--color-bg-danger); }
+  .btn.ghost { background: none; border-color: transparent; color: var(--color-text-secondary); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .hide-warning {
+    background: var(--color-bg-infoSubtle);
+    color: var(--color-text-info);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    margin-top: var(--space-sm);
+  }
+
+  .section-title {
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    padding: var(--space-sm) 0;
+    border-top: 1px solid var(--color-border-subtle);
+    user-select: none;
+  }
+  .breakdown-row {
+    display: flex; justify-content: space-between;
+    padding: var(--space-xs) 0;
+    font-size: var(--font-size-sm);
+  }
+  .breakdown-row .lbl { color: var(--color-text-secondary); }
+  .breakdown-row.total { border-top: 1px dashed var(--color-border-default); margin-top: var(--space-xs); padding-top: var(--space-sm); font-weight: var(--font-weight-semibold); }
+  .breakdown-row .val { font-variant-numeric: tabular-nums; }
+  .breakdown-row .val.editable { cursor: pointer; text-decoration: underline dotted; }
+
+  .notes-label { font-size: var(--font-size-sm); color: var(--color-text-secondary); margin: var(--space-md) 0 var(--space-xs); }
+  .notes {
+    width: 100%; min-height: 70px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm);
+    font: inherit; font-size: var(--font-size-sm);
+    resize: vertical;
+  }
+
+  /* ---------- Activity popup ---------- */
+  .scrim {
+    position: fixed; inset: 0;
+    background: transparent;
+    z-index: var(--z-scrim);
+  }
+  .activity-popup {
+    position: fixed;
+    z-index: calc(var(--z-scrim) + 1);
+    background: var(--color-bg-overlay);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    width: 460px;
+    max-width: calc(100vw - 32px);
+    overflow: hidden;
+  }
+  .activity-popup .pop-head {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--color-border-subtle);
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  .activity-popup .pop-title { font-weight: var(--font-weight-semibold); }
+  .activity-popup .pop-sub { font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+  .activity-popup .pop-close { background:none; border:none; color: var(--color-icon-secondary); font-size: var(--font-size-sm); }
+  .act-table { width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); }
+  .act-table th, .act-table td { padding: var(--space-sm) var(--space-md); text-align: left; }
+  .act-table thead th { font-size: var(--font-size-xs); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--color-border-subtle); }
+  .act-table tbody tr { cursor: pointer; border-bottom: 1px solid var(--color-border-subtle); }
+  .act-table tbody tr:hover { background: var(--color-bg-page); }
+  .act-table .amt { text-align: right; font-variant-numeric: tabular-nums; }
+  .act-table .memo { color: var(--color-text-secondary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .act-empty { padding: var(--space-2xl); text-align: center; color: var(--color-text-secondary); font-size: var(--font-size-sm); }
+
+  /* ---------- Modal ---------- */
+  .modal-scrim {
+    position: fixed; inset: 0;
+    background: var(--color-bg-scrim);
+    z-index: var(--z-scrim);
+    display: grid; place-items: center;
+    padding: var(--space-md);
+  }
+  .modal {
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 420px; max-width: 100%;
+    z-index: var(--z-modal);
+    padding: var(--space-lg);
+  }
+  .modal h3 { margin: 0 0 var(--space-sm); font-size: var(--font-size-lg); }
+  .modal p { margin: 0 0 var(--space-lg); color: var(--color-text-secondary); font-size: var(--font-size-sm); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: var(--space-sm); }
+
+  .preview-note {
+    max-width: 1240px; margin: 0 auto; padding: var(--space-sm) var(--space-xl) 0;
+    font-size: var(--font-size-xs); color: var(--color-text-secondary);
+  }
+</style>
+</head>
+<body>
+<div class="preview-note">Static mockup — Budget Overview · faithful to <code>docs/screens/BudgetOverview.md</code> v1.1 · tokens from <code>docs/Theme.md</code> v1.0. Sample data only.</div>
+
+<div class="content" data-testid="budget-overview">
+  <!-- Page header -->
+  <header class="page-header">
+    <div class="month-nav">
+      <button class="month-arrow" data-testid="month-prev" title="Previous month">←</button>
+      <button class="month-label" data-testid="month-label" id="monthLabel">June 2026</button>
+      <button class="month-arrow" data-testid="month-next" title="Next month">→</button>
+    </div>
+    <div class="alert-bar info" id="alertBar" data-testid="alert-bar"></div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT COLUMN -->
+    <div class="left-col">
+      <nav class="filter-tabs" id="filterTabs" data-testid="filter-tabs"></nav>
+
+      <div class="toolbar">
+        <button class="tool-btn primary" data-testid="add-group-btn">+ Add Category Group</button>
+        <span class="spacer"></span>
+        <button class="tool-btn icon-only" title="Undo">↶</button>
+        <button class="tool-btn icon-only" title="Redo">↷</button>
+      </div>
+
+      <div class="card env-table" data-testid="envelope-table">
+        <div class="table-head">
+          <div>Envelope</div>
+          <div class="num">Assigned</div>
+          <div class="num">Activity</div>
+          <div class="num">Available</div>
+        </div>
+        <div id="tableBody"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="detail-col">
+      <div class="card detail-panel" id="detailPanel" data-testid="detail-panel"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   Sample data
+   ===================================================================== */
+const TOTAL_AVAILABLE_MONEY = 25_000_000; // sum of account balances
+
+const GROUPS = [
+  { id: "bills",    name: "Bills (Hóa đơn)" },
+  { id: "food",     name: "Food (Ăn uống)" },
+  { id: "transport",name: "Transport (Đi lại)" },
+  { id: "savings",  name: "Savings (Tiết kiệm)" },
+];
+
+// available = carriedOver + assigned + cashSpending + creditSpending
+const ENVELOPES = [
+  { id:"rent",      groupId:"bills",     name:"Rent",          carriedOver:0,        assigned:7_000_000, cashSpending:-7_000_000, creditSpending:0,         hidden:false, notes:"" },
+  { id:"electric",  groupId:"bills",     name:"Electricity",   carriedOver:120_000,  assigned:600_000,   cashSpending:-680_000,   creditSpending:0,         hidden:false, notes:"" },
+  { id:"internet",  groupId:"bills",     name:"Internet",      carriedOver:0,        assigned:250_000,   cashSpending:-250_000,   creditSpending:0,         hidden:false, notes:"" },
+  { id:"water",     groupId:"bills",     name:"Water",         carriedOver:50_000,   assigned:150_000,   cashSpending:0,          creditSpending:0,         hidden:false, notes:"" },
+
+  { id:"groceries", groupId:"food",      name:"Groceries",     carriedOver:300_000,  assigned:3_000_000, cashSpending:-2_100_000, creditSpending:-400_000,  hidden:false, notes:"Đi chợ + siêu thị" },
+  { id:"eatout",    groupId:"food",      name:"Eating Out",    carriedOver:0,        assigned:1_500_000, cashSpending:-1_800_000, creditSpending:-300_000,  hidden:false, notes:"" },
+  { id:"coffee",    groupId:"food",      name:"Coffee",        carriedOver:0,        assigned:500_000,   cashSpending:-500_000,   creditSpending:0,         hidden:false, notes:"" },
+
+  { id:"fuel",      groupId:"transport", name:"Fuel",          carriedOver:80_000,   assigned:800_000,   cashSpending:-620_000,   creditSpending:0,         hidden:false, notes:"" },
+  { id:"grab",      groupId:"transport", name:"Grab",          carriedOver:0,        assigned:400_000,   cashSpending:0,          creditSpending:-150_000,  hidden:false, notes:"" },
+
+  { id:"emergency", groupId:"savings",   name:"Emergency Fund",carriedOver:5_000_000,assigned:2_000_000, cashSpending:0,          creditSpending:0,         hidden:false, notes:"Mục tiêu 6 tháng chi phí" },
+  { id:"vacation",  groupId:"savings",   name:"Vacation",      carriedOver:1_200_000,assigned:1_000_000, cashSpending:0,          creditSpending:0,         hidden:true,  notes:"Đà Nẵng cuối năm" },
+];
+
+const TRANSACTIONS = {
+  electric: [
+    { id:"t1", account:"VCB",  date:"25/06/2026", payee:"EVN HCMC",        memo:"Hóa đơn điện tháng 6 — phòng khách + máy lạnh", amount:-680_000 },
+  ],
+  groceries: [
+    { id:"t2", account:"VCB",  date:"26/06/2026", payee:"Bách Hóa Xanh",   memo:"Rau củ, thịt, trứng",                          amount:-420_000 },
+    { id:"t3", account:"Cash", date:"24/06/2026", payee:"Chợ Bà Chiểu",    memo:"Cá, rau",                                       amount:-180_000 },
+    { id:"t4", account:"MoMo", date:"20/06/2026", payee:"WinMart",         memo:"Đồ khô + gia vị tháng",                         amount:-1_500_000 },
+    { id:"t5", account:"Credit",date:"18/06/2026",payee:"Co.opmart",        memo:"Mua sắm cuối tuần",                             amount:-400_000 },
+  ],
+  eatout: [
+    { id:"t6", account:"Credit",date:"27/06/2026",payee:"Pizza 4P's",      memo:"Tối thứ 7 với gia đình",                        amount:-300_000 },
+    { id:"t7", account:"VCB",  date:"22/06/2026", payee:"Phở Hòa",         memo:"",                                              amount:-1_800_000 },
+  ],
+  fuel: [
+    { id:"t8", account:"Cash", date:"23/06/2026", payee:"Petrolimex",      memo:"Đổ đầy bình",                                   amount:-620_000 },
+  ],
+};
+
+/* =====================================================================
+   Helpers
+   ===================================================================== */
+const available = e => e.carriedOver + e.assigned + e.cashSpending + e.creditSpending;
+const activity  = e => e.cashSpending + e.creditSpending;
+
+function fmtVND(n) {
+  const sign = n < 0 ? "-" : "";
+  const abs = Math.abs(n);
+  if (abs === 0) return "0đ";
+  const s = abs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return sign + s + "đ";
+}
+function fmtInput(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+
+const FILTERS = [
+  { value:"all",             label:"All",            test:e=>true },
+  { value:"overspent",       label:"Overspent",      test:e=>available(e) < 0 },
+  { value:"underfunded",     label:"Underfunded",    test:e=>available(e) >= 0 && available(e) < e.assigned * 0.5 },
+  { value:"overfunded",      label:"Overfunded",     test:e=>available(e) > e.assigned * 2 },
+  { value:"money_available", label:"Money Available",test:e=>available(e) > 0 },
+  { value:"snoozed",         label:"Snoozed",        test:e=>e.hidden },
+];
+
+/* =====================================================================
+   State
+   ===================================================================== */
+const state = {
+  selectedId: null,
+  activeFilter: "all",
+  collapsed: new Set(),
+  editing: false,
+  breakdownOpen: false,
+  hideWarn: false,
+};
+
+/* =====================================================================
+   Render: Alert bar
+   ===================================================================== */
+function renderAlert() {
+  const el = document.getElementById("alertBar");
+  const totalAssigned = ENVELOPES.filter(e=>!e.hidden).reduce((s,e)=>s+e.assigned,0);
+  const diff = TOTAL_AVAILABLE_MONEY - totalAssigned;
+  if (diff === 0) { el.hidden = true; return; }
+  el.hidden = false;
+  if (diff < 0) {
+    el.className = "alert-bar danger";
+    el.dataset.testid = "alert-bar-danger";
+    el.innerHTML = `<span class="alert-icon">⚠️</span>
+      <span class="alert-msg"><b>${fmtVND(Math.abs(diff))}</b> · You have assigned more than you have</span>
+      <button class="alert-action">Fix This</button>`;
+  } else {
+    el.className = "alert-bar info";
+    el.dataset.testid = "alert-bar-info";
+    el.innerHTML = `<span class="alert-icon">💡</span>
+      <span class="alert-msg"><b>${fmtVND(diff)}</b> · You have money left to assign</span>
+      <button class="alert-action">Assign Now</button>`;
+  }
+}
+
+/* =====================================================================
+   Render: Filter tabs
+   ===================================================================== */
+function renderFilters() {
+  const nav = document.getElementById("filterTabs");
+  nav.innerHTML = "";
+  FILTERS.forEach(f => {
+    const b = document.createElement("button");
+    b.className = "filter-tab" + (state.activeFilter===f.value?" active":"");
+    b.textContent = f.label;
+    b.dataset.testid = "filter-tab-" + f.value;
+    b.onclick = () => { state.activeFilter = f.value; renderFilters(); renderTable(); };
+    nav.appendChild(b);
+  });
+}
+
+/* =====================================================================
+   Render: Envelope table
+   ===================================================================== */
+function availClass(v){ return v>0?"pos":(v<0?"neg":"zero-amt"); }
+
+function renderTable() {
+  const body = document.getElementById("tableBody");
+  body.innerHTML = "";
+  const filter = FILTERS.find(f=>f.value===state.activeFilter);
+  const snoozedTab = state.activeFilter === "snoozed";
+
+  let anyShown = false;
+
+  GROUPS.forEach(g => {
+    let envs = ENVELOPES.filter(e => e.groupId === g.id);
+    // hidden envelopes only appear in the snoozed tab
+    envs = envs.filter(e => snoozedTab ? e.hidden : !e.hidden);
+    envs = envs.filter(filter.test);
+    if (envs.length === 0) return;
+    anyShown = true;
+
+    const collapsed = state.collapsed.has(g.id);
+    const gAssigned = envs.reduce((s,e)=>s+e.assigned,0);
+    const gActivity = envs.reduce((s,e)=>s+activity(e),0);
+    const gAvail    = envs.reduce((s,e)=>s+available(e),0);
+
+    const gr = document.createElement("div");
+    gr.className = "group-row";
+    gr.dataset.testid = "group-row-" + g.id;
+    gr.innerHTML = `
+      <div><span class="chevron" data-testid="group-toggle-${g.id}">${collapsed?"▸":"▾"}</span>${g.name}</div>
+      <div class="num">${fmtVND(gAssigned)}</div>
+      <div class="num">${fmtVND(gActivity)}</div>
+      <div class="num ${availClass(gAvail)}">${fmtVND(gAvail)}</div>`;
+    gr.onclick = () => {
+      if (collapsed) state.collapsed.delete(g.id); else state.collapsed.add(g.id);
+      renderTable();
+    };
+    body.appendChild(gr);
+
+    if (collapsed) return;
+
+    envs.forEach(e => {
+      const av = available(e);
+      const act = activity(e);
+      const row = document.createElement("div");
+      row.className = "env-row" + (state.selectedId===e.id?" selected":"");
+      row.dataset.testid = "envelope-row-" + e.id;
+
+      // status badge
+      let badge = "";
+      if (av < 0) badge = `<span class="badge over">Overspent ${fmtVND(Math.abs(av))}</span>`;
+      else if (act !== 0 && av === 0) badge = `<span class="badge spent">Fully Spent</span>`;
+
+      row.innerHTML = `
+        <div class="env-name">
+          <span class="label">${e.name}</span>${badge}
+        </div>
+        <div class="cell-assigned" data-testid="assigned-cell-${e.id}">${fmtVND(e.assigned)}</div>
+        <div class="cell-activity ${act!==0?"clickable":"zero"}" data-testid="activity-cell-${e.id}">${fmtVND(act)}</div>
+        <div class="cell-available ${availClass(av)}" data-testid="available-cell-${e.id}">${fmtVND(av)}</div>`;
+
+      // row select (outside assigned/activity cells)
+      row.onclick = () => selectEnvelope(e.id);
+
+      // assigned inline edit
+      const aCell = row.querySelector(".cell-assigned");
+      aCell.onclick = (ev) => { ev.stopPropagation(); startAssignedEdit(aCell, e); };
+
+      // activity popup
+      const actCell = row.querySelector(".cell-activity");
+      actCell.onclick = (ev) => {
+        ev.stopPropagation();
+        if (act !== 0) openActivityPopup(e, actCell);
+      };
+
+      body.appendChild(row);
+    });
+  });
+
+  if (!anyShown) {
+    const empty = document.createElement("div");
+    empty.style.padding = "var(--space-xl)";
+    empty.style.textAlign = "center";
+    empty.style.color = "var(--color-text-secondary)";
+    empty.dataset.testid = "filter-empty";
+    empty.textContent = "No envelopes match this filter";
+    body.appendChild(empty);
+  }
+}
+
+/* assigned inline edit */
+function startAssignedEdit(cell, e) {
+  const input = document.createElement("input");
+  input.className = "assigned-input";
+  input.type = "text";
+  input.value = fmtInput(e.assigned);
+  input.dataset.testid = "assigned-input-" + e.id;
+  cell.innerHTML = "";
+  cell.appendChild(input);
+  input.focus();
+  input.select();
+
+  const commit = () => {
+    const raw = parseInt(input.value.replace(/[^\d]/g,""), 10);
+    e.assigned = isNaN(raw) ? 0 : Math.max(0, raw);
+    renderAll();
+  };
+  input.oninput = () => {
+    const raw = input.value.replace(/[^\d]/g,"");
+    input.value = raw ? fmtInput(parseInt(raw,10)) : "";
+  };
+  input.onkeydown = (ev) => {
+    if (ev.key === "Enter") { ev.preventDefault(); commit(); }
+    else if (ev.key === "Escape") { renderAll(); }
+  };
+  input.onblur = commit;
+}
+
+/* =====================================================================
+   Render: Detail panel
+   ===================================================================== */
+function selectEnvelope(id) {
+  state.selectedId = id;
+  state.editing = false;
+  state.hideWarn = false;
+  closeActivityPopup();
+  renderTable();
+  renderDetail();
+}
+
+function renderDetail() {
+  const panel = document.getElementById("detailPanel");
+  const e = ENVELOPES.find(x=>x.id===state.selectedId);
+
+  if (!e) {
+    panel.innerHTML = `<div class="detail-empty" data-testid="detail-panel-empty">
+      <span class="big">📂</span>Select an envelope to see details</div>`;
+    return;
+  }
+
+  const av = available(e);
+
+  const header = state.editing ? `
+    <div class="edit-form">
+      <input class="name-input" id="nameInput" value="${e.name.replace(/"/g,'&quot;')}" maxlength="50" data-testid="envelope-name-input" />
+      <div class="edit-actions">
+        <button class="btn" data-testid="envelope-hide-btn" onclick="onHide()">Hide</button>
+        <button class="btn danger" data-testid="envelope-delete-btn" onclick="onDelete()">Delete</button>
+        <span style="flex:1"></span>
+        <button class="btn ghost" data-testid="envelope-cancel-btn" onclick="onCancelEdit()">Cancel</button>
+        <button class="btn primary" id="saveBtn" data-testid="envelope-save-btn" onclick="onSaveName()">Save</button>
+      </div>
+      ${state.hideWarn ? `<div class="hide-warning">This envelope still has <b>${fmtVND(av)}</b>. The money will not be lost but the envelope will not appear this month.
+        <div style="margin-top:8px"><button class="btn" onclick="confirmHide()">Hide Anyway</button>
+        <button class="btn ghost" onclick="state.hideWarn=false;renderDetail()">Cancel</button></div></div>` : ``}
+    </div>` : `
+    <div class="detail-header">
+      <span class="name" data-testid="envelope-name" onclick="startEdit()">${e.name}</span>
+      <button class="icon-btn" data-testid="envelope-edit-btn" title="Rename" onclick="startEdit()">✏️</button>
+    </div>`;
+
+  const breakdown = `
+    <div data-testid="balance-breakdown">
+      <div class="section-title" onclick="state.breakdownOpen=!state.breakdownOpen;renderDetail()">
+        <span>Available Balance · <span class="${availClass(av)}">${fmtVND(av)}</span></span>
+        <span>${state.breakdownOpen?"▾":"▸"}</span>
+      </div>
+      ${state.breakdownOpen ? `
+        <div class="breakdown-row" data-testid="balance-carried-over"><span class="lbl">Carried Over From Last Month</span><span class="val">${fmtVND(e.carriedOver)}</span></div>
+        <div class="breakdown-row" data-testid="balance-assigned"><span class="lbl">Assigned This Month</span><span class="val editable" onclick="editAssignedFromPanel('${e.id}')">${fmtVND(e.assigned)}</span></div>
+        <div class="breakdown-row" data-testid="balance-cash-spending"><span class="lbl">Cash Spending</span><span class="val neg">${fmtVND(e.cashSpending)}</span></div>
+        <div class="breakdown-row" data-testid="balance-credit-spending"><span class="lbl">Credit Spending</span><span class="val neg">${fmtVND(e.creditSpending)}</span></div>
+        <div class="breakdown-row total"><span>Available</span><span class="val ${availClass(av)}">${fmtVND(av)}</span></div>
+      ` : ``}
+    </div>`;
+
+  panel.innerHTML = header + breakdown + `
+    <div class="notes-label">Notes</div>
+    <textarea class="notes" data-testid="envelope-notes" placeholder="Add a note…">${e.notes||""}</textarea>`;
+
+  if (state.editing) {
+    const ni = document.getElementById("nameInput");
+    const sb = document.getElementById("saveBtn");
+    const sync = () => { sb.disabled = ni.value.trim().length === 0; };
+    ni.oninput = sync; sync();
+    ni.focus();
+  }
+}
+
+/* Detail panel actions */
+function startEdit(){ state.editing = true; state.hideWarn=false; renderDetail(); }
+function onCancelEdit(){ state.editing = false; state.hideWarn=false; renderDetail(); }
+function onSaveName(){
+  const e = ENVELOPES.find(x=>x.id===state.selectedId);
+  const v = document.getElementById("nameInput").value.trim();
+  if (v) e.name = v;
+  state.editing = false;
+  renderAll();
+}
+function onHide(){
+  const e = ENVELOPES.find(x=>x.id===state.selectedId);
+  if (available(e) > 0) { state.hideWarn = true; renderDetail(); }
+  else confirmHide();
+}
+function confirmHide(){
+  const e = ENVELOPES.find(x=>x.id===state.selectedId);
+  e.hidden = true;
+  state.selectedId = null; state.editing=false; state.hideWarn=false;
+  renderAll();
+}
+function editAssignedFromPanel(id){
+  // jump to the table cell editor for parity
+  const cell = document.querySelector(`[data-testid="assigned-cell-${id}"]`);
+  if (cell) cell.click();
+}
+
+/* Delete modal */
+function onDelete(){
+  const e = ENVELOPES.find(x=>x.id===state.selectedId);
+  const txns = (TRANSACTIONS[e.id]||[]).length;
+  const hasTxns = txns > 0;
+  const scrim = document.createElement("div");
+  scrim.className = "modal-scrim";
+  scrim.dataset.testid = "modal-scrim";
+  scrim.innerHTML = `
+    <div class="modal" data-testid="modal" role="dialog" aria-modal="true">
+      <h3 data-testid="modal-title">Delete envelope "${e.name}"?</h3>
+      <p data-testid="modal-body">${hasTxns
+        ? `This envelope has ${txns} transactions. Please reassign them to another envelope before deleting.`
+        : `This action cannot be undone.`}</p>
+      <div class="modal-actions">
+        <button class="btn ghost" data-testid="modal-secondary">Cancel</button>
+        <button class="btn ${hasTxns?'primary':'danger'}" data-testid="modal-primary">
+          ${hasTxns ? 'Reassign Transactions' : 'Delete'}</button>
+      </div>
+    </div>`;
+  const close = () => scrim.remove();
+  scrim.onclick = (ev)=>{ if (ev.target===scrim) close(); };
+  scrim.querySelector('[data-testid="modal-secondary"]').onclick = close;
+  scrim.querySelector('[data-testid="modal-primary"]').onclick = () => {
+    if (!hasTxns) {
+      const idx = ENVELOPES.findIndex(x=>x.id===e.id);
+      ENVELOPES.splice(idx,1);
+      state.selectedId = null; state.editing=false;
+      renderAll();
+    }
+    close();
+  };
+  document.body.appendChild(scrim);
+}
+
+/* =====================================================================
+   Activity popup
+   ===================================================================== */
+let popupEls = [];
+function closeActivityPopup(){ popupEls.forEach(el=>el.remove()); popupEls = []; }
+
+function openActivityPopup(e, anchorCell) {
+  closeActivityPopup();
+  const group = GROUPS.find(g=>g.id===e.groupId);
+  const txns = (TRANSACTIONS[e.id]||[]).slice().sort((a,b)=>{
+    const pa = a.date.split("/").reverse().join("");
+    const pb = b.date.split("/").reverse().join("");
+    return pb.localeCompare(pa);
+  });
+
+  const scrim = document.createElement("div");
+  scrim.className = "scrim";
+  scrim.onclick = closeActivityPopup;
+
+  const pop = document.createElement("div");
+  pop.className = "activity-popup";
+  pop.dataset.testid = "activity-popup";
+
+  const rows = txns.map(t => `
+    <tr data-testid="activity-row-${t.id}">
+      <td>${t.account}</td>
+      <td>${t.date}</td>
+      <td>${t.payee}</td>
+      <td class="memo" title="${t.memo}">${t.memo.length>40?t.memo.slice(0,40)+"…":t.memo}</td>
+      <td class="amt ${t.amount<0?'neg':'pos'}">${fmtVND(t.amount)}</td>
+    </tr>`).join("");
+
+  pop.innerHTML = `
+    <div class="pop-head">
+      <div>
+        <div class="pop-title">Activity</div>
+        <div class="pop-sub">${group ? group.name : ""} · ${e.name}</div>
+      </div>
+      <button class="pop-close" data-testid="activity-close">Close</button>
+    </div>
+    ${txns.length ? `
+      <table class="act-table">
+        <thead><tr><th>Account</th><th>Date</th><th>Payee</th><th>Memo</th><th class="amt">Amount</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>` : `<div class="act-empty" data-testid="activity-popup-empty">No transactions this month</div>`}`;
+
+  document.body.appendChild(scrim);
+  document.body.appendChild(pop);
+  popupEls = [scrim, pop];
+
+  // position near the anchor cell (desktop popover)
+  const r = anchorCell.getBoundingClientRect();
+  const top = Math.min(r.bottom + 6, window.innerHeight - pop.offsetHeight - 12);
+  let left = r.right - pop.offsetWidth;
+  left = Math.max(12, left);
+  pop.style.top = top + "px";
+  pop.style.left = left + "px";
+
+  pop.querySelector('[data-testid="activity-close"]').onclick = closeActivityPopup;
+  pop.querySelectorAll("tbody tr").forEach(tr => {
+    tr.onclick = () => { alert("→ Navigate to TransactionForm (mockup)"); };
+  });
+}
+
+/* =====================================================================
+   Init
+   ===================================================================== */
+function renderAll(){ renderAlert(); renderFilters(); renderTable(); renderDetail(); }
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeActivityPopup(); });
+renderAll();
+</script>
+</body>
+</html>
